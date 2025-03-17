@@ -12,7 +12,7 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null); // ✅ Initialize useState before useEffect
-  const [loading,setLoading] = useState(false)
+  const [loading,setLoading] = useState(true)
 
   function signUp(email, password) {
     return createUserWithEmailAndPassword(auth, email, password); // ✅ Return the promise
@@ -55,6 +55,7 @@ export function AuthProvider({ children }) {
 
   const value = {
     currentUser,
+    loading,
     login,
     logout,
     resetPassword,

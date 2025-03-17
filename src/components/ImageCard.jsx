@@ -1,19 +1,47 @@
-import React from 'react'
+import React from "react";
+import { Card, CardMedia, CardContent, Typography } from "@mui/material";
 
-const ImageCard = (props) => {
+const ImageCard = ({ src, alt, description }) => {
   return (
-    <div>
-        <figure className="group relative max-w-sm transition-all duration-300 cursor-pointer rounded-3xl backdrop-brightness-150 shadow-[0px_0px_28px_18px_rgba(52,27,243,0.7)] hover:shadow-none">
-        <a href="#">
-            <img className="rounded-lg" src={props.src} alt={props.alt}/>
-        </a>
-        <figcaption className="px-4 text-lg text-white bottom-6">
-            <p className='text-blue-400 font-mono font-semibold rounded text center group-hover:text-red-500'>{props.description}</p>
-        </figcaption>
-        </figure>
+    <Card
+      sx={{
+        maxWidth: { xs: "100%", sm: 400, md: 500 },
+        borderRadius: "20px",
+        overflow: "hidden",
+        boxShadow: "0px 0px 20px rgba(52,27,243,0.5)",
+        transition: "all 0.3s ease-in-out",
+        "&:hover": {
+          boxShadow: "none",
+          transform: "scale(1.02)",
+        },
+      }}
+    >
+      <CardMedia
+        component="img"
+        image={src}
+        alt={alt}
+        sx={{
+          width: "100%",
+          height: { xs: 200, sm: 300, md: 350 },
+          objectFit: "cover",
+        }}
+      />
+      <CardContent sx={{ backgroundColor: "#1E1E1E", textAlign: "center" }}>
+        <Typography
+          variant="h6"
+          sx={{
+            color: "#4ADE80",
+            fontWeight: "bold",
+            fontFamily: "monospace",
+            transition: "color 0.3s",
+            "&:hover": { color: "#F87171" },
+          }}
+        >
+          {description}
+        </Typography>
+      </CardContent>
+    </Card>
+  );
+};
 
-    </div>
-  )
-}
-
-export default ImageCard
+export default ImageCard;

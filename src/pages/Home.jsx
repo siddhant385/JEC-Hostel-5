@@ -1,32 +1,109 @@
-import React from 'react'
-import ImageCard from '../components/ImageCard'
-import { NavLink } from 'react-router-dom'
+import React from "react";
+import { Container, Typography, Grid, Button, Card, CardMedia, CardContent } from "@mui/material";
+import { LocationOn, Home, Room } from "@mui/icons-material";
+import { NavLink } from "react-router-dom";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import Testimonials from "../components/Testimonial";
+import Amenities from "../components/Amenities";
+import FAQ from "../components/FAQ";
+import Events from "../components/Events";
 
-const Home = () => {
+
+const HomeScreen = () => {
+  const carouselImages = [
+    "https://i.ytimg.com/vi/KD5KOwM4-Z8/sddefault.jpg",
+    "https://i.ytimg.com/vi/KD5KOwM4-Z8/sddefault.jpg",
+    "https://i.ytimg.com/vi/KD5KOwM4-Z8/sddefault.jpg",
+  ];
+
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+    arrows: false,
+  };
+
   return (
-    <div className="flex-col">
-    <h1 className="font-manrope text-5xl my-3 text-center font-black leading-snug text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-pink-600 to-purple-600">HOSTEL NO. 5</h1>
-    <div className="flex items-center justify-between">
-      <div className="flex-col items-center mx-30">
-        <ImageCard src="https://i.ytimg.com/vi/KD5KOwM4-Z8/sddefault.jpg" alt="jec hostel" description="Where Dreams Come True"/>
-        <div className="flex-col text-white my-20 rounded-2xl p-5 shadow-[0px_0px_28px_18px_rgba(52,27,243,0.7)] hover:shadow-none">
-          <p><span>📍 </span>Jabalpur Engineering College Hostel No. 5</p>
-          <p><span>🚩 </span>At Ranjhi, Jabalpur</p>
-          <p><span>@ </span>482011</p>
+    <Container maxWidth="lg">
+      {/* Hero Section */}
+      <Typography
+        variant="h3"
+        align="center"
+        sx={{
+          fontWeight: "bold",
+          mt: 5,
+          mb: 3,
+          background: "linear-gradient(90deg, #4b0082, #ff1493, #800080)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+        }}
+      >
+        🏠 HOSTEL NO. 5
+      </Typography>
 
-        </div>
-      </div>
-      <div className="flex-col items-center m-auto my-10">
-        <div className="shadow-[0px_0px_18px_20px_rgba(242,2,2,0.7)] p-10 rounded-3xl">
-          <NavLink to='/createAccount'><button to='/login' className='m-auto w-100 bg-blue-500 text-black rounded py-4 px-2 font-dark  hover:shadow-[0px_0px_13px_10px_rgba(0,110,255,0.8)] cursor-pointer'>Create Account</button></NavLink>
-          <p className='text-center text-red-500 py-4'>OR</p>
-          <NavLink to='/login'><button className='m-auto w-100 bg-blue-500 text-black rounded py-4 px-2 font-dark  hover:shadow-[0px_0px_13px_10px_rgba(0,110,255,0.8)] cursor-pointer'>Login</button></NavLink>
-        </div>
-      
-      </div>
-    </div>
-    </div>
-  )
-}
+      {/* Carousel */}
+      <Slider {...sliderSettings}>
+        {carouselImages.map((img, index) => (
+          <Card key={index} sx={{ borderRadius: 3, overflow: "hidden" }}>
+            <CardMedia component="img" image={img} alt={`Slide ${index + 1}`} sx={{ height: { xs: 200, sm: 350, md: 500 } }} />
+          </Card>
+        ))}
+      </Slider>
+      <Amenities/>
 
-export default Home
+      {/* Info & Actions */}
+      <Grid container spacing={4} alignItems="center" sx={{ mt: 5 }}>
+        {/* Left Side */}
+        <Grid item xs={12} md={6}>
+          <Card sx={{ p: 3, borderRadius: 3, boxShadow: "0px 4px 10px rgba(0,0,0,0.2)" }}>
+            <CardContent>
+              <Typography variant="h5" gutterBottom>
+                📍 Jabalpur Engineering College Hostel No. 5
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                <LocationOn sx={{ verticalAlign: "middle" }} /> Ranjhi, Jabalpur
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                <Room sx={{ verticalAlign: "middle" }} /> Pin Code: 482011
+              </Typography>
+              <Typography variant="body1" color="textSecondary">
+                <Home sx={{ verticalAlign: "middle" }} /> Safe, Comfortable & Student-Friendly Environment
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Right Side (Buttons) */}
+        <Grid item xs={12} md={6} sx={{ textAlign: "center" }}>
+          <Card sx={{ p: 4, borderRadius: 3, boxShadow: "0px 5px 15px rgba(0,0,0,0.3)", textAlign: "center" }}>
+            <NavLink to="/createAccount">
+              <Button variant="contained" color="primary" sx={{ mb: 2, width: "100%" }}>
+                Create Account 🚀
+              </Button>
+            </NavLink>
+            <Typography variant="body1" color="error" gutterBottom>
+              OR
+            </Typography>
+            <NavLink to="/login">
+              <Button variant="contained" color="secondary" sx={{ width: "100%" }}>
+                Login 🔑
+              </Button>
+            </NavLink>
+          </Card>
+        </Grid>
+      </Grid>
+      <Testimonials/>
+      <Events/>
+      <FAQ/>
+    </Container>
+    
+  );
+};
+
+export default HomeScreen;

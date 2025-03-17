@@ -1,17 +1,26 @@
 import React, { useState } from "react";
-import { auth, db } from "../firebase"; // Ensure correct Firebase imports
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
+import {
+  Container,
+  Paper,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  Avatar,
+  IconButton,
+  CircularProgress,
+} from "@mui/material";
+import { PhotoCamera, PersonAdd } from "@mui/icons-material";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-
-
+import { auth, db } from "../firebase";
+import { doc, setDoc } from "firebase/firestore";
 
 const CreateAccount = () => {
-  const {signUp,currentUser} = useAuth()
-  const [loading,setLoading] = useState(false)
-  const navigate = useNavigate()
+  const { signUp } = useAuth();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,60 +33,54 @@ const CreateAccount = () => {
     aadhaarNo: "",
     contactNo: "",
     profilePic: null,
-    deletePic:null,
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
   const handleFileChange = (e) => {
     setFormData({ ...formData, profilePic: e.target.files[0] });
   };
 
-
   const uploadImageToImgBB = async (file) => {
+    if (!file) return ""; // Return empty if no file is selected
     const apiKey = import.meta.env.VITE_IMAGEBB_API_KEY;
     const imageData = new FormData();
     imageData.append("image", file);
-  
+
     try {
       const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
         method: "POST",
         body: imageData,
       });
-  
       const data = await response.json();
-  
       if (data.success) {
-        return {
-          profilePicUrl: data.data.url,      // Image URL to store
-          deleteUrl: data.data.delete_url,   // Delete URL for future deletion
-        };
+        return data.data.url;
       } else {
-        throw new Error("Image upload failed.");
+        throw new Error("Image upload failed");
       }
     } catch (error) {
       toast.error("Image upload failed: " + error.message);
-      return null;
+      return "";
     }
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
     }
-  
+    setLoading(true);
     try {
-      setLoading(true);
-      let profilePicData = { profilePicUrl: "", deleteUrl: "" };
-  
+      let profilePicUrl = "";
       if (formData.profilePic) {
-        profilePicData = await uploadImageToImgBB(formData.profilePic);
+        profilePicUrl = await uploadImageToImgBB(formData.profilePic);
       }
-  
+      // Create user with email and password
       const userCredentials = await signUp(formData.email, formData.password);
-      
+      // Save additional user data in Firestore
       await setDoc(doc(db, "users", userCredentials.user.uid), {
         firstName: formData.firstName,
         lastName: formData.lastName,
@@ -87,42 +90,224 @@ const CreateAccount = () => {
         roomNo: formData.roomNo,
         aadhaarNo: formData.aadhaarNo,
         contactNo: formData.contactNo,
-        profilePic: profilePicData.profilePicUrl, // Store Image URL
-        deleteUrl: profilePicData.deleteUrl, // Store Delete URL
+        profilePic: profilePicUrl,
       });
-  
-      toast.success("Account created successfully!");
+      toast.success("Account created successfully! 🎉");
       navigate("/login");
     } catch (error) {
       toast.error(error.message);
     }
     setLoading(false);
   };
-  
 
   return (
-    <div className="w-100 mb-24 rounded-2xl border-1 mx-auto my-10 p-6 bg-gray-900 flex-col shadow-[0px_0px_23px_21px_rgba(46,88,255,1)] hover:shadow-[0px_0px_23px_21px_rgba(240,0,220,1)]">
-      <h2 className="text-green-400 text-center text-3xl my-5">Create Account</h2>
-      <form className="w-full flex flex-col p-3" onSubmit={handleSubmit}>
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]" type="text" name="firstName" placeholder="First Name" onChange={handleChange}  />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="lastName" placeholder="Last Name" onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="email" name="email" placeholder="Email Address" onChange={handleChange}  />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="password" name="password" placeholder="Password" onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="password" name="confirmPassword" placeholder="Confirm Password" onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="branch" placeholder="Branch" onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="from" placeholder="From" onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="roomNo" placeholder="Room No." onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="aadhaarNo" placeholder="Aadhaar No." onChange={handleChange} />
-        <input  className="w-75 h-10 bg-gray-950 text-15 text-center border-pink-500 text-amber-50 my-3 mx-5 rounded border-2 hover:shadow-[0px_0px_6px_4px_rgba(234,7,237,1)]"type="text" name="contactNo" placeholder="Contact No." onChange={handleChange} />
+    <Container maxWidth="xs" sx={{ mt: 8 }}>
+      <Paper
+        elevation={8}
+        sx={{
+          p: 4,
+          backgroundColor: "#1E1E1E",
+          color: "#F0F0F0",
+          borderRadius: 2,
+        }}
+      >
+        <Box display="flex" flexDirection="column" alignItems="center" mb={3}>
+          <Avatar
+            src={
+              formData.profilePic instanceof File
+                ? URL.createObjectURL(formData.profilePic)
+                : "/default-avatar.png"
+            }
+            sx={{ width: 100, height: 100, mb: 1, border: "2px solid #4ADE80" }}
+          />
+          <input
+            type="file"
+            id="profilePicUpload"
+            accept="image/*"
+            onChange={handleFileChange}
+            style={{ display: "none" }}
+          />
+          <label htmlFor="profilePicUpload">
+            <IconButton component="span" sx={{ color: "#4ADE80" }}>
+              <PhotoCamera />
+            </IconButton>
+          </label>
+          <Typography variant="body2" sx={{ color: "#F87171" }}>
+            Upload Profile Picture
+          </Typography>
+        </Box>
 
-        {/* Profile Picture Upload */}
-        <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-white" htmlFor="multiple_files">Upload Profile Pic</label>  
-        <input onChange={handleFileChange}  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" id="multiple_files" type="file" multiple/>
+        <Typography variant="h4" align="center" sx={{ mb: 3, color: "#4ADE80" }}>
+          Create Account ✨
+        </Typography>
 
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 2 }}
+        >
+          <TextField
+            label="First Name"
+            name="firstName"
+            variant="outlined"
+            value={formData.firstName}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Last Name"
+            name="lastName"
+            variant="outlined"
+            value={formData.lastName}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            value={formData.email}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Password"
+            name="password"
+            type="password"
+            variant="outlined"
+            value={formData.password}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            variant="outlined"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Branch"
+            name="branch"
+            variant="outlined"
+            value={formData.branch}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="From"
+            name="from"
+            variant="outlined"
+            value={formData.from}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Room No."
+            name="roomNo"
+            variant="outlined"
+            value={formData.roomNo}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Aadhaar No."
+            name="aadhaarNo"
+            variant="outlined"
+            value={formData.aadhaarNo}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
+          <TextField
+            label="Contact No."
+            name="contactNo"
+            variant="outlined"
+            value={formData.contactNo}
+            onChange={handleChange}
+            fullWidth
+            sx={{
+              backgroundColor: "#2D2D2D",
+              input: { color: "#FDE68A" },
+              label: { color: "#FBBF24" },
+            }}
+          />
 
-        <button type="submit" disabled={loading} className="bg-blue-800 cursor-pointer text-white py-2 rounded mt-4 hover:bg-blue-600 hover:shadow-[0px_0px_6px_4px_rgba(7,126,237,1)]" onClick={handleSubmit}>{loading ? "Creating..." : "Sign Up"}</button>
-      </form>
-    </div>
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            disabled={loading}
+            sx={{
+              backgroundColor: "#4ADE80",
+              color: "black",
+              fontWeight: "bold",
+              "&:hover": { backgroundColor: "#22C55E" },
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "white" }} />
+            ) : (
+              "Sign Up 😊"
+            )}
+          </Button>
+        </Box>
+
+        <Typography variant="body2" align="center" sx={{ mt: 2, color: "#9CA3AF" }}>
+          Already have an account?{" "}
+          <Link to="/login" style={{ color: "#4ADE80", textDecoration: "none" }}>
+            Login
+          </Link>
+        </Typography>
+      </Paper>
+    </Container>
   );
 };
 
