@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 
 const ForgotPassword = () => {
-  const { forgotPassword } = useAuth();
+  const { resetPassword } = useAuth();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await forgotPassword(email);
+      await resetPassword(email);
       toast.success("Password reset email sent! 📧");
       navigate("/login");
     } catch (error) {
