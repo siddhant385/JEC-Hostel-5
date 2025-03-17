@@ -243,13 +243,20 @@ function Navbar() {
               >
                 Login
               </Button>
-              <Button 
-                component={NavLink} 
-                to="/createAccount"
-                variant="contained" 
-                color="secondary"
-                size="small"
-              >
+                <Button
+                  component={NavLink}
+                  to="/createAccount"
+                  variant="contained"
+                  size="small"
+                  sx={{
+                    background: "linear-gradient(135deg, #00ff00, #008000)", // Green gradient ✅
+                    color: "#fff",
+                    "&:hover": {
+                      background: "linear-gradient(135deg, #008000, #00ff00)", // Reverse hover
+                    },
+                  }}
+                >
+
                 Sign Up
               </Button>
               <IconButton onClick={toggleTheme} color="inherit">
