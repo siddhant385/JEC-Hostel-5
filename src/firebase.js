@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 
-console.log("Firebase API Key:", import.meta.env.VITE_FIREBASE_API_KEY);
+// console.log("Firebase API Key:", import.meta.env.VITE_FIREBASE_API_KEY);
 
 
 const firebaseConfig = {
