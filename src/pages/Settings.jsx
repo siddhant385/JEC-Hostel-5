@@ -15,10 +15,12 @@ import { useAuth } from "../contexts/AuthContext";
 import { db } from "../firebase";
 import { doc, updateDoc, onSnapshot } from "firebase/firestore";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Settings = () => {
-  const { updatemail, updatepassword, currentUser } = useAuth();
+  const {updatepassword, currentUser,setPasswordForGoogleUser,setProfileCompleted,profileCompleted } = useAuth();
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -92,25 +94,28 @@ const Settings = () => {
       await updateDoc(userRef, {
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
         branch: formData.branch,
         from: formData.from,
         roomNo: formData.roomNo,
         aadhaarNo: formData.aadhaarNo,
         contactNo: formData.contactNo,
         profilePic: profilePicUrl,
+        profileCompleted:true
       });
 
       // Update Firebase Auth Email if changed
-      if (formData.email !== currentUser.email) {
-        await updatemail(formData.email);
-      }
       // Update Firebase Auth Password if provided and confirmed
       if (formData.password && formData.password === formData.confirmPassword) {
-        await updatepassword(formData.password);
+        profileCompleted?await updatepassword(formData.password):
+        await setPasswordForGoogleUser(currentUser.email, formData.password)
+        // await updatepassword(formData.password);
       }
+      setProfileCompleted(true);
+
 
       toast.success("Profile updated successfully!");
+      
+      navigate("/dashboard")
       // No need to reload; the realtime listener updates the UI automatically.
     } catch (error) {
       toast.error("Update failed: " + error.message);
@@ -173,12 +178,12 @@ const Settings = () => {
             {[
               { label: "First Name", name: "firstName" },
               { label: "Last Name", name: "lastName" },
-              { label: "Email", name: "email", type: "email" },
               { label: "Branch", name: "branch" },
               { label: "From", name: "from" },
               { label: "Room No.", name: "roomNo" },
               { label: "Aadhaar No.", name: "aadhaarNo" },
               { label: "Contact No.", name: "contactNo" },
+              { label: "Email Add.", name:'email'}
             ].map((field, index) => (
               <TextField
                 key={index}
@@ -187,8 +192,10 @@ const Settings = () => {
                 label={field.label}
                 name={field.name}
                 type={field.type || "text"}
-                value={formData[field.name] || ""}
+                value={field.name ==="email"?currentUser.email:formData[field.name] || ""}
                 onChange={handleChange}
+                disabled = {field.name ==="email"?true:false}
+                required={true}
                 sx={{
                   backgroundColor: "#2D2D2D",
                   input: { color: "#FDE68A" },
@@ -206,7 +213,8 @@ const Settings = () => {
             <TextField
               fullWidth
               variant="outlined"
-              label="New Password"
+              label={profileCompleted?"Update Password":"New Password"}
+              required={profileCompleted?false:true}
               name="password"
               type="password"
               value={formData.password}
@@ -223,6 +231,7 @@ const Settings = () => {
               label="Confirm Password"
               name="confirmPassword"
               type="password"
+              required={profileCompleted?false:true}
               value={formData.confirmPassword}
               onChange={handleChange}
               sx={{

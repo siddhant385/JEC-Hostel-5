@@ -13,7 +13,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { toast } from "react-toastify";
 
 const Login = () => {
-  const { login, currentUser } = useAuth();
+  const { login, currentUser,signInWithGoogle } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,6 +36,10 @@ const Login = () => {
       toast.error(error.message);
     }
     setLoading(false);
+  };
+
+  const handleGoogleSignIn = async () => {
+    const user = await signInWithGoogle();
   };
 
   // Use useEffect to redirect once currentUser is set
@@ -121,6 +125,15 @@ const Login = () => {
             )}
           </Button>
         </Box>
+
+        <Button
+          onClick={handleGoogleSignIn}
+          variant="outlined"
+          fullWidth
+          sx={{ mt: 2, color: "#4ADE80", borderColor: "#4ADE80" }}
+        >
+          Sign in with Google
+        </Button>
 
         <Typography
           variant="body2"

@@ -14,7 +14,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { PrivateRoute } from './components/PrivateRoute';
 import ForgotPassword from './pages/ForgotPassword';
 import { ThemeProviderComponent } from "./contexts/ThemeContext";
-
+import { SettingsRoute } from './components/SettingsRoute';
+import SetPasswordModal from './pages/setPasswordModal'
 
 // Dark Theme Configuration
 const darkTheme = createTheme({
@@ -63,7 +64,10 @@ const App = () => {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               {/* Private Routes */}
               <Route element={<PrivateRoute />}>
-                <Route path="/dashboard" element={<Dashboard />} />
+                <Route element={<SettingsRoute/>}> 
+                  <Route path="/dashboard" element={<Dashboard />} />
+                </Route>
+                <Route path="/set-password" element={<SetPasswordModal />}/>
                 <Route path="/settings" element={<Settings />} />
               </Route>
             </Routes>

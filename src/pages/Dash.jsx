@@ -17,8 +17,7 @@ const Dash = () => {
         return value.includes(searchTerm.toLowerCase());
       });
     }, [users, searchTerm, filterType]);
-  
-  
+    
     return (
       <Container>
         {/* Search Component */}
@@ -42,6 +41,7 @@ const Dash = () => {
                   branch={user.branch}
                   contactNo={user.contactNo}
                   profilePic={user.profilePic}
+                  
                 />
               </Grid>
             ))}

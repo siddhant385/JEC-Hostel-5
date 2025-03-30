@@ -6,14 +6,44 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PhoneIcon from '@mui/icons-material/Phone';
+import { useState,useEffect } from 'react';
 
 export default function ItemCard({ name, profilePic, branch, from, contactNo }) {
+  const[profilePhoto,setProfilePhoto] =useState(null);
+  
+  useEffect(() => {
+    async function fetchImage() {
+      try {
+        const response = await fetch("https://random.dog/woof.json");
+        const data = await response.json();
+        
+        // Ensure it's a valid image URL (sometimes API returns videos)
+        if (data.url.endsWith(".jpg") || data.url.endsWith(".png") || data.url.endsWith(".jpeg")) {
+          setProfilePhoto(data.url);
+        } else {
+          setProfilePhoto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcCGCJNBI8Ap3hKJmHu0p826Qyb3Bc5SrPAA&s"); // Fallback image
+        }
+      } catch (error) {
+        console.error("Error fetching image:", error);
+        setProfilePhoto("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRcCGCJNBI8Ap3hKJmHu0p826Qyb3Bc5SrPAA&s"); // Fallback image on error
+      }
+    }
+
+    if (!profilePic) {
+      fetchImage();
+    }
+  }, [profilePic]); // Run only if profilePic is null
+
+
+  
+    
+
   return (
     <Card sx={{ maxWidth: 245 }} elevation={10}>
       <CardMedia
         component="img"
         sx={{ height: 140, objectFit: "contain" }}
-        image={profilePic}
+        image={profilePic || profilePhoto}
         title={name}
         alt={name}
         className='bg-red-500'

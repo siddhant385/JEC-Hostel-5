@@ -2,9 +2,10 @@ import { Accordion, AccordionSummary, AccordionDetails, Typography, Container } 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const faqs = [
-  { question: "What are the hostel fees?", answer: "The fees are ₹30,00 per year, excluding food and WiFi." },
-  { question: "Is there a curfew?", answer: "No, students are free to leave and come" },
-  { question: "Are visitors allowed?", answer: "No, They aren't allowed" },
+  { question: "What are the other things we will get with the hostel room?", answer: "You'll get a bed, table, fan, 2 tubelights, & and almirah." },
+  { question: "What are the mess timings", answer: "Mess is open for 2 times a day. From 12pm in the afternoon and 7pm in the night." },
+  { question: "What about the water facilities?", answer: "Water is supplied 2 times a day 5am in the morning and 5pm in the evening For drinking purposes,you'll get RO water from the water cooler" },
+  { question: "What is the distance between college and hostel?", answer:"850m"}
 ];
 
 const FAQ = () => (
